@@ -87,13 +87,16 @@ async def show_info(message: Message):
         "+7 (812) 363-60-00 (доб. 9114)",
         parse_mode=ParseMode.HTML
     )
+
+@router.message(F.text == 'Статус')
+async def show_status(message: Message):
     msg = cursor.execute('''SELECT date, content FROM info''').fetchall()
-    print(msg)
+
+    if not msg:
+        await message.answer("Пока нет никаких сообщений!")
 
     for date, content in msg:
-        await message.answer(f"Дата: {date.split('-')[-1]}.{date.split('-')[-2]}\nСообщение: {content}")
-
-
+        await message.answer(f"Дата: {date}\nСообщение: {content}")
 
 @router.callback_query(F.data.startswith("date"))
 async def date_seletected(callback: CallbackQuery):
@@ -182,7 +185,7 @@ async def back_to_slots(callback: CallbackQuery):
 async def admin_show_schedule(message: Message):
     await message.answer("Выберите дату:", reply_markup=kb.dates_admin_kb())
 
-@router.message(F.text == 'Добавить/удалить информацию')
+@router.message(F.text == 'Добавить / изменить статус')
 async def admin_show_info(message: Message):
     await message.answer("Что вы хотите сделать?", reply_markup=kb.add_remove_info())
 
@@ -213,7 +216,7 @@ async def get_id(message: Message, state: FSMContext):
 @router.callback_query(F.data == 'add_info')
 async def add_info(callback: CallbackQuery, state: FSMContext):
     await state.set_state(InfoMessage.content)
-    await callback.message.answer("Введите информацию")
+    await callback.message.answer("Введите сообщение")
 
 @router.message(InfoMessage.content)
 async def get_info(message: Message, state: FSMContext):
@@ -222,12 +225,12 @@ async def get_info(message: Message, state: FSMContext):
     msg = await state.get_data()
 
     cursor.execute('''INSERT INTO info (date, content) VALUES (?, ?)''',
-                   (datetime.now(TIMEZONE).strftime('%Y-%m-%d'),msg['content'],))
+                   (datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M'),msg['content'],))
     conn.commit()
 
     await state.clear()
 
-    await message.answer("Информация успешна добавлена!")
+    await message.answer("Сообщение успешно добавлено!")
 
 
 

@@ -10,11 +10,12 @@ main = ReplyKeyboardMarkup(keyboard= [
     [KeyboardButton(text="Посмотреть расписание")],
     [KeyboardButton(text="Мои брони")],
     [KeyboardButton(text="Информация")],
+    [KeyboardButton(text="Статус")],
     ], resize_keyboard=True)
 
 main_admin = ReplyKeyboardMarkup(keyboard= [
     [KeyboardButton(text="Изменить расписание")],
-    [KeyboardButton(text="Добавить/удалить информацию")],
+    [KeyboardButton(text="Добавить / изменить статус")],
     ], resize_keyboard=True)
 
 
@@ -114,11 +115,11 @@ def admin_available_options_slot(date: str, user_slot: int):
 
 def add_remove_info():
     button1 = InlineKeyboardButton(
-        text=f"Добавить информацию",
+        text=f"Добавить сообщение",
         callback_data=f"add_info"
     )
     button2 = InlineKeyboardButton(
-        text='Удалить информацию',
+        text='Удалить сообщение',
         callback_data=f'remove_info'
     )
     return InlineKeyboardMarkup(inline_keyboard=[[button1], [button2]])
