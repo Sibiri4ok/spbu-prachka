@@ -5,16 +5,13 @@ import aiosqlite
 
 import config
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message, ReplyKeyboardMarkup
-from aiogram.filters import CommandStart
 from app.handlers import router, init_db
 from middleware import DBMiddleware
-import app.keyboards as kb
-
 
 
 bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher()
+
 
 async def main():
     db_connection = await aiosqlite.connect("db.sqlite3")
@@ -24,9 +21,13 @@ async def main():
     await dp.start_polling(bot, db=db_connection)
     await db_connection.close()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
-        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+        logging.basicConfig(
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level=logging.INFO,
+        )
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Exiting...")
