@@ -1,11 +1,14 @@
 import asyncio
 import logging
 
+import aiosqlite
+
 import config
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message, ReplyKeyboardMarkup
 from aiogram.filters import CommandStart
-from app.handlers import router
+from app.handlers import router, init_db
+from middleware import DBMiddleware
 import app.keyboards as kb
 
 
@@ -14,8 +17,12 @@ bot = Bot(token=config.API_TOKEN)
 dp = Dispatcher()
 
 async def main():
+    db_connection = await aiosqlite.connect("db.sqlite3")
+    dp.update.outer_middleware(DBMiddleware(db_connection))
     dp.include_router(router)
-    await dp.start_polling(bot)
+    await init_db(db_connection)
+    await dp.start_polling(bot, db=db_connection)
+    await db_connection.close()
 
 if __name__ == '__main__':
     try:
